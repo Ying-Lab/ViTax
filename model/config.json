@@ -1,0 +1,27 @@
+{
+  "d_model": 256,
+  "n_layer": 4,
+  "d_inner": 1024,
+  "vocab_size": 12,
+  "resid_dropout": 0.0,
+  "embed_dropout": 0.1,
+  "fused_mlp": false,
+  "fused_dropout_add_ln": true,
+  "residual_in_fp32": true,
+  "checkpoint_mixer": true,
+  "checkpoint_mlp": true,
+  "pad_vocab_size_multiple": 8,
+  "return_hidden_state": true,
+  "layer": {
+    "_name_": "hyena",
+    "emb_dim": 5,
+    "filter_order": 64,
+    "local_order": 3,
+    "l_max": 32770,
+    "modulate": true,
+    "w": 10,
+    "lr": 6e-4,
+    "wd": 0.0,
+    "lr_pos_emb": 0.0
+  }
+}
