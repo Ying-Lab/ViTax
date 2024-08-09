@@ -16,7 +16,7 @@ parser.add_argument('--kmean', help='kmeans result',  default = 'model/kmeans.pi
 parser.add_argument('--tree', help='taxonomy belief tree',  default = 'model/tbt.pickle')
 parser.add_argument('--out', help='name of the output file',  type=str, default = 'prediction_output.txt')
 parser.add_argument('--index', help='tree index',  type=str, default = 'model/index.pickle')
-parser.add_argument('--confidence', help='The confidence threshold (default 0.6)',  default = 0.6)
+parser.add_argument('--confidence', help='The confidence threshold (default 0.6)', type=float, default = 0.6)
 
 inputs = parser.parse_args()
 
