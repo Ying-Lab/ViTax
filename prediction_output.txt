@@ -1,0 +1,8 @@
+NC_053247.1 Zitchvirus_Genus 0.82
+NC_031271.1 Zindervirus_Genus 0.90
+NC_048638.1 Zicotriavirus_Genus 0.90
+NC_047824.1 Yushanvirus_Genus 0.94
+NC_028980.1 Yuavirus_Genus 0.99
+NC_041934.1 Yuavirus_Genus 1.00
+NC_048805.1 Yonseivirus_Genus 0.97
+NC_028959.1 Yongloolinvirus_Genus 0.86

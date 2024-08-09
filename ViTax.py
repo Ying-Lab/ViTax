@@ -16,6 +16,7 @@ parser.add_argument('--kmean', help='kmeans result',  default = 'model/kmeans.pi
 parser.add_argument('--tree', help='taxonomy belief tree',  default = 'model/tbt.pickle')
 parser.add_argument('--out', help='name of the output file',  type=str, default = 'prediction_output.txt')
 parser.add_argument('--index', help='tree index',  type=str, default = 'model/index.pickle')
+parser.add_argument('--confidence', help='The confidence threshold (default 0.6)',  default = 0.6)
 
 inputs = parser.parse_args()
 
@@ -25,6 +26,7 @@ model_dict = inputs.model
 kmeans_dict = inputs.kmean
 tree_dict = inputs.tree
 index_dict = inputs.index
+confidence = inputs.confidence
 
 # load taxonomy belief tree and tree node
 node = load_node(tree_dict)
@@ -70,7 +72,7 @@ with torch.no_grad():
           ind = kmean.predict(embedding.cpu().numpy().tolist())
           inds.extend(ind)
     add_values_node2(tbt,index,inds)
-    max_sum,leaf = max_leaf_sum2(tbt["root"],confidence=0.6,length=len(dnas)*2)
+    max_sum,leaf = max_leaf_sum2(tbt["root"],confidence=confidence,length=len(dnas)*2)
     belief = max_sum/(len(dnas)*2)
     if leaf.level == "root":
       pname = "unclassified"
@@ -81,4 +83,4 @@ with open(output_dir, "w") as file:
     # 遍历字符串列表，并将每个元素写入文件，每个字符串后跟一个换行符
     for string in results:
         file.write(string + "\n")
-  
+print("Done, please check the output file: " + output_dir)
