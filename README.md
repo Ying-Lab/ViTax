@@ -14,8 +14,10 @@ python ViTax.py [--contigs INPUT_FA] [--out OUTPUT_TXT]
 --contigs INPUT_FA   input fasta file
 --out OUTPUT_TXT     The output csv file (prediction_output.txt default) 
 --confidence         The confidence threshold of the prediction (0.6 default)  
+--rc                 include reverse complement prediction (default True)
+--window_size        The sliding window size (default 400)
 ```
 ## Example
 ```
-python ViTax.py --contigs test.fa --out prediction_output.txt --confidence 0.6
+python ViTax.py --contigs test.fa --out prediction_output.txt --confidence 0.6 --rc False --window_size 400
 ```

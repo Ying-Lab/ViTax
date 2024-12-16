@@ -6,6 +6,7 @@ from Bio import SeqIO
 from lca.tree import *
 from utils import *
 from tqdm import tqdm
+from distutils.util import strtobool
 parser = argparse.ArgumentParser(description="""ViTax is a python library for DSDNA virus genus-level classification.""")
 
 
@@ -17,6 +18,8 @@ parser.add_argument('--tree', help='taxonomy belief tree',  default = 'model/tbt
 parser.add_argument('--out', help='name of the output file',  type=str, default = 'prediction_output.txt')
 parser.add_argument('--index', help='tree index',  type=str, default = 'model/index.pickle')
 parser.add_argument('--confidence', help='The confidence threshold (default 0.6)', type=float, default = 0.6)
+parser.add_argument('--window_size', help='The sliding window size (default 400)', type=int, default = 400)
+parser.add_argument('--rc', help='include reverse complement prediction (default True)',  type=lambda x: bool(strtobool(x.lower())), default=True)
 
 inputs = parser.parse_args()
 
@@ -27,6 +30,8 @@ kmeans_dict = inputs.kmean
 tree_dict = inputs.tree
 index_dict = inputs.index
 confidence = inputs.confidence
+RC = inputs.rc
+ws = inputs.window_size
 
 # load taxonomy belief tree and tree node
 node = load_node(tree_dict)
@@ -57,15 +62,16 @@ with torch.no_grad():
     sequence = str(record.seq)
     inds = []
     
-    dnas = split_string(sequence,chunk_size=2000,step_size=400)
+    dnas = split_string(sequence,chunk_size=2000,step_size=ws)
     for i in range(0, len(dnas), batch):
           batch_dnas = dnas[i:i+batch] if i+batch <= len(dnas) else dnas[i:]
           dna_token = dnatokenizer(batch_dnas,padding=True, return_tensors = 'pt')['input_ids'].to(device)
           embedding = model.get_dna(dna_token)
           ind = kmean.predict(embedding.cpu().numpy().tolist())
           inds.extend(ind)
-    dnas = split_string(reverse_complement(sequence),chunk_size=2000,step_size=400)
-    for i in range(0, len(dnas), batch):
+    if RC:
+      dnas = split_string(reverse_complement(sequence),chunk_size=2000,step_size=ws)
+      for i in range(0, len(dnas), batch):
           batch_dnas = dnas[i:i+batch] if i+batch <= len(dnas) else dnas[i:]
           dna_token = dnatokenizer(batch_dnas,padding=True, return_tensors = 'pt')['input_ids'].to(device)
           embedding = model.get_dna(dna_token)
