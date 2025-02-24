@@ -7,9 +7,9 @@ from lca.tree import *
 from utils import *
 from tqdm import tqdm
 from distutils.util import strtobool
+
+
 parser = argparse.ArgumentParser(description="""ViTax is a python library for DSDNA virus genus-level classification.""")
-
-
 
 parser.add_argument('--contigs', help='FASTA file of contigs',  default = 'test_contigs.fasta')
 parser.add_argument('--model', help='Model weight',  default = 'model/model_weight.pth')
@@ -38,6 +38,7 @@ node = load_node(tree_dict)
 kmean = load_node(kmeans_dict)
 index = load_node(index_dict)
 
+
 #determine GPU or CPU, which device is used.
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  # Specify the GPU device
 
@@ -63,12 +64,17 @@ with torch.no_grad():
     inds = []
     
     dnas = split_string(sequence,chunk_size=2000,step_size=ws)
+    if RC:
+      lendna = 2*len(dnas)
+    else:
+      lendna = len(dnas)
     for i in range(0, len(dnas), batch):
           batch_dnas = dnas[i:i+batch] if i+batch <= len(dnas) else dnas[i:]
           dna_token = dnatokenizer(batch_dnas,padding=True, return_tensors = 'pt')['input_ids'].to(device)
           embedding = model.get_dna(dna_token)
           ind = kmean.predict(embedding.cpu().numpy().tolist())
           inds.extend(ind)
+        
     if RC:
       dnas = split_string(reverse_complement(sequence),chunk_size=2000,step_size=ws)
       for i in range(0, len(dnas), batch):
@@ -78,8 +84,8 @@ with torch.no_grad():
           ind = kmean.predict(embedding.cpu().numpy().tolist())
           inds.extend(ind)
     add_values_node2(tbt,index,inds)
-    max_sum,leaf = max_leaf_sum2(tbt["root"],confidence=confidence,length=len(dnas)*2)
-    belief = max_sum/(len(dnas)*2)
+    max_sum,leaf = max_leaf_sum2(tbt["root"],confidence=confidence,length=lendna)
+    belief = max_sum/lendna
     if leaf.level == "root":
       pname = "unclassified"
     else:
